@@ -1,0 +1,6 @@
+{
+    "player": {"speed": 5},
+    "enemy": {"speed": 3},
+    "alien": {"speed": 5},
+    "astronaut": {"speed": 3}
+}

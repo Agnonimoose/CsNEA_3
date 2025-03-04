@@ -1,0 +1,60 @@
+{
+    "level_1" :{
+        "background": "assets/bg.png",
+        "ambientSound": "",
+        "platforms": {
+                "ground": [0, 400, 1000, 400], 
+                "platform1": [200, 300, 200, 20],
+                "platform2": [500, 250, 200, 20],
+                "platform3": [300, 200, 200, 20],
+                "right_platform": [700, 300, 200, 20],
+                "left_wall": [0, 0, 20, 400],
+                "right_wall": [580, 0, 20, 400]
+            },
+        "items": {
+            "money1": {
+                "type": "Money",
+                "position": [200, 100]
+            },
+            "oxygen1": {
+                "type": "OxygenPump",
+                "position": [550, 200]
+            },
+            "money2": {
+                "type": "Money",
+                "position": [750, 200]
+            },
+            "barerock1": {
+                "type": "BareRock",
+                "position": [300, 100]
+            },
+            "mossyrock1": {
+                "type": "MossyRock",
+                "position": [250, 100]
+            },
+            "pressureplate1": {
+                "type": "PressurePlate",
+                "position": [400,100]
+            }
+            
+        },
+        "alien": {
+            "position": [200, 100]
+        }, 
+        "astronaut": {
+            "position": [220, 100]
+            }
+        },
+
+
+
+        
+    "level_2": {"platforms": {"starter": [100, 300, 200, 20], 
+            "left bound": [100, 150, 20, 150],
+            "right bound": [170, 150, 20, 150]
+
+        }, 
+        "alien": {"position": [200, 100]}, 
+        "astronaut": {"position": [200, 100]}}
+
+}
