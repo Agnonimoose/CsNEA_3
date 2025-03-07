@@ -125,6 +125,9 @@ class World:
                  'MossyRock': MossyRock
                  }
         
+        self.gameItems = {}
+
+
         self.tilemap = []
         self.neighbouring_offsets = [(-1, 0), (-1, -1), (0, -1), (1, -1),
                     (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
@@ -141,29 +144,33 @@ class World:
         self.entity_layer = WORLD_CONFIG[str(level)]["entities"]
         self.background = pygame.image.load(WORLD_CONFIG[str(level)]["background"])
         
-        # # Load items
-        # for y, row in enumerate(self.item_layer):
-        #     for x, tile in enumerate(row):
-        #         if tile == 2:  # Oxygen pump
-        #             self.items.add(OxygenPump("oxy", (x*TILE_SIZE, y*TILE_SIZE)))
-        #         elif tile == 3:  # Pressure plate
-        #             self.items.add(PressurePlate("plate", (x*TILE_SIZE, y*TILE_SIZE)))
+
+        for y, row in enumerate(self.item_layer):
+            for x, tile in enumerate(row):
+                if tile == 2:  # Oxygen pump
+                    self.items.add(OxygenPump("oxy", (x*TILE_SIZE, y*TILE_SIZE)))
+                elif tile == 3:  # Pressure plate
+                    self.items.add(PressurePlate("plate", (x*TILE_SIZE, y*TILE_SIZE)))
+
+
 
         # Load entities
         self.ast_start = self.entity_layer["astronaut"]
         self.alien_start = self.entity_layer["alien"]
+
+
         
 
 
     def renderWorld(self, BUFFER, offset = (0, 0), debug=False):
         if debug:
-        # Draw grid lines
             for x in range(offset[0] // self.tilesize, (offset[0] + BUFFER.get_width()) // self.tilesize + 2):
                 pygame.draw.line(BUFFER, (0, 255, 255), (x * self.tilesize - offset[0], 0),
                                 (x * self.tilesize - offset[0], BUFFER.get_height()))
             for y in range(offset[1] // self.tilesize, (offset[1] + BUFFER.get_height()) // self.tilesize + 2):
                 pygame.draw.line(BUFFER, (0, 255, 255), (0, y * self.tilesize - offset[1]),
                                 (BUFFER.get_width(), y * self.tilesize - offset[1]))
+        
         for x in range(offset[0] // self.tilesize, (offset[0] + BUFFER.get_width()) // self.tilesize + 1):
             for y in range(offset[1] // self.tilesize, (offset[1] + BUFFER.get_height()) // self.tilesize + 1):
                 loc = str(x) + ';' + str(y)
@@ -179,7 +186,17 @@ class World:
                     # rect = pygame.Rect(tile_x, tile_y, self.tilesize, self.tilesize)
                     # pygame.draw.rect(BUFFER, (255, 0, 0), rect, 1)  # Red rectangle, 1 pixel thick
 
+    # def spawnItems(self, BUFFER, offset = (0, 0)):
+    def spawnItems(self):
+        for item in self.item_layer:
+            self.gameItems[item["id"]] = self.itemTypes[item["type"]](item["id"], item["position"])
 
+    def updateItems(self, buffer, offset):
+        for id, item in self.gameItems.items():
+            print("id = ", id)
+            print("item = ", item)
+            item.update(self)
+            item.draw(buffer, offset)
 
     def tiles_around_pos(self, pos):
         tiles = []
@@ -273,7 +290,7 @@ def main_game(level):
     world = World(level = level)
     AstrChar = Astronaut(position=world.ast_start, keys=ASTR_KEYS)
     # AlienChar = Alien(position=world.alien_start, keys=ALIEN_KEYS)
-
+    world.spawnItems()
     clock.tick(FPS)
 
 
@@ -309,10 +326,10 @@ def main_game(level):
                 BUFFER.blit(world.background, (x, y))
 
         world.renderWorld(BUFFER, offset=render_scroll)
-
+        world.updateItems(BUFFER, render_scroll)
         # for item in world.items:
-        #     item.update(world.platforms, camera_offset)
-        #     item.draw(BUFFER, camera_offset, camera)
+        #     # item.update(world.platforms, render_scroll)
+        #     item.draw(BUFFER, render_scroll)
 
         # camera.update(AstrChar)
 
