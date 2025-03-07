@@ -159,3 +159,8 @@ class Character(pygame.sprite.Sprite):
             this = self.position
         
         return math.sqrt((this[0] - other[0])**2 + (this[1] - other[1])**2)
+
+
+
+
+        
