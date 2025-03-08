@@ -99,7 +99,7 @@ class World:
         self.background = None
         self.ambientSound = None
         # self.platforms = pygame.sprite.Group()
-        self.items = pygame.sprite.Group()
+        self.items = {}
         self.assets = {
             'decor': load_images('tiles/decor'),
             'stone': load_images('tiles/stone'),
@@ -148,9 +148,9 @@ class World:
         for y, row in enumerate(self.item_layer):
             for x, tile in enumerate(row):
                 if tile == 2:  # Oxygen pump
-                    self.items.add(OxygenPump("oxy", (x*TILE_SIZE, y*TILE_SIZE)))
+                    self.items["oxy"] = OxygenPump("oxy", (x*TILE_SIZE, y*TILE_SIZE))
                 elif tile == 3:  # Pressure plate
-                    self.items.add(PressurePlate("plate", (x*TILE_SIZE, y*TILE_SIZE)))
+                    self.items["plate"] = PressurePlate("plate", (x*TILE_SIZE, y*TILE_SIZE))
 
 
 
@@ -176,25 +176,16 @@ class World:
                 loc = str(x) + ';' + str(y)
                 if loc in self.tilemap:
                     tile = self.tilemap[loc]
-                    # print(tile)
-                    # print(offset)
                     BUFFER.blit(self.assets[tile['type']][tile['variant']], (
                         tile['pos'][0] * self.tilesize - offset[0], tile['pos'][1] * self.tilesize - offset[1]))
 
-                    # tile_x = tile['pos'][0] * self.tilesize - offset[0]
-                    # tile_y = tile['pos'][1] * self.tilesize - offset[1]
-                    # rect = pygame.Rect(tile_x, tile_y, self.tilesize, self.tilesize)
-                    # pygame.draw.rect(BUFFER, (255, 0, 0), rect, 1)  # Red rectangle, 1 pixel thick
-
-    # def spawnItems(self, BUFFER, offset = (0, 0)):
+    
     def spawnItems(self):
         for item in self.item_layer:
             self.gameItems[item["id"]] = self.itemTypes[item["type"]](item["id"], item["position"])
 
     def updateItems(self, buffer, offset):
         for id, item in self.gameItems.items():
-            print("id = ", id)
-            print("item = ", item)
             item.update(self)
             item.draw(buffer, offset)
 
@@ -288,7 +279,7 @@ def main_game(level):
     run = True
 
     world = World(level = level)
-    AstrChar = Astronaut(position=world.ast_start, keys=ASTR_KEYS)
+    AstrChar = Astronaut("Player1", position=world.ast_start, keys=ASTR_KEYS)
     # AlienChar = Alien(position=world.alien_start, keys=ALIEN_KEYS)
     world.spawnItems()
     clock.tick(FPS)

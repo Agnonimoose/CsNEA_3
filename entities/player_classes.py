@@ -5,8 +5,8 @@ font = pygame.font.Font(None, 24)  # Default font, size 24
 
 
 class Player(Character):
-    def __init__(self, speed, position=(0, 0), keys=ASTR_KEYS):
-        super().__init__("player", position) # calls the character's constructor 
+    def __init__(self, characterType, id, position=(0, 0), keys=ASTR_KEYS):
+        super().__init__(characterType, id, position) # calls the character's constructor 
         self.width = 30
         self.height = 40
         self.left = False
@@ -16,8 +16,8 @@ class Player(Character):
     def takeDamage(self):
         pass
 
-    def interact(self, items):
-        for item in items:
+    def interact(self, world):
+        for id, item in world.items.items():
             print(f'item {item.id} found at {item.position}, my postion at {self.position} our distance = {self.getDistance(item.position)}')
             # if self.getDistance(item.position) < 25:
             if self.getDistance(item.position) < 31:
@@ -45,7 +45,7 @@ class Player(Character):
             self.move(direction)
         
         if pressed_keys[self.KEYS["interact"]]:
-            self.interact(items)
+            self.interact(world)
         
 
         self.check_collisions(world)
@@ -55,9 +55,18 @@ class Player(Character):
         self.update_image()
         self.update_rect()
 
+    def slice_sprite_sheet(self):
+        frames = []
+        num_frames = self.sprite_sheet.get_width() // self.frame_width
+        for i in range(num_frames):
+            frame = pygame.Surface((self.frame_width, self.frame_height), pygame.SRCALPHA)
+            frame.blit(self.sprite_sheet, (0, 0), (i * self.frame_width, 0, self.frame_width, self.frame_height))
+            frames.append(frame)
+        return frames
+
 class Alien(Player):
-    def __init__(self, position=(0, 0), keys=ASTR_KEYS, speed=5, phaseAbilityDuration=10, shapeShiftState="default"):
-        super().__init__(speed, position, keys)  # calls the player's constructor
+    def __init__(self, id, position=(0, 0), keys=ASTR_KEYS, speed=5, phaseAbilityDuration=10, shapeShiftState="default"):
+        super().__init__("alien", id, position, keys)  # calls the player's constructor
         self.playerType = "alien"
         self.phaseAbilityDuration = phaseAbilityDuration 
         self.shapeShiftState = shapeShiftState
@@ -73,8 +82,8 @@ class Alien(Player):
         pass
 
 class Astronaut(Player):
-    def __init__(self, position=(0, 0), keys=ASTR_KEYS, speed=5, oxygenLevel=100, toolbox=None, currentEnvironment="space_station"):
-        super().__init__(speed, position, keys) 
+    def __init__(self, id, position=(0, 0), keys=ASTR_KEYS, speed=5, oxygenLevel=100, toolbox=None, currentEnvironment="space_station"):
+        super().__init__("astronaut", id, position, keys) 
         self.playerType = "astronaut"
         self.baseSpeed = speed 
         self.oxygenLevel = oxygenLevel     
@@ -89,9 +98,22 @@ class Astronaut(Player):
         self.inventory_size = 4  
         self.selected_slot = 0
 
-        self.image = pygame.image.load("assets/astronaut_still.png")
+        # self.image = pygame.image.load("assets/astronaut_still.png")
+        # self.image = pygame.transform.scale(self.image, (30, 40))
+        # self.original_image = self.image.copy()
+
+        self.sprite_sheet = pygame.image.load("assets/sprite_sheets/Astro-alpha.png").convert_alpha()
+        self.frame_width = 16
+        self.frame_height = 16
+        self.animation_frames = self.slice_sprite_sheet()
+        self.walking_animation_speed = 5
+        self.frame_count = 0
+        self.facing_right = True
+        self.current_frame = 0
+        self.image = self.animation_frames[self.current_frame]
         self.image = pygame.transform.scale(self.image, (30, 40))
         self.original_image = self.image.copy()
+
 
         self.rect = self.image.get_rect()
         self.rect.topleft = position
